@@ -27,8 +27,8 @@ def replace_IncludeDocument(content):
             break
     return content
 
-def fix_page(client, path):
-    data = client.page(path)
+def fix_page(client, path, page = "WebHome", language = None):
+    data = client.page(path, page, language)
     content = data["content"]
     print(content)
 
