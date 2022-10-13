@@ -1,10 +1,11 @@
 import requests
 
 class Client:
-    def __init__(self, api_root, auth_user=None, auth_pass=None):
+    def __init__(self, api_root, auth_user=None, auth_pass=None, wiki="xwiki"):
         self.api_root = api_root
         self.auth_user = auth_user
         self.auth_pass = auth_pass
+        self.wiki = wiki
 
     def _build_url(self, path):
         url = self.api_root + "/".join(path)
@@ -35,7 +36,11 @@ class Client:
         return response.status_code
 
     def spaces(self):
-        path = ['spaces']
+        path = []
+        if self.wiki:
+            path.append('wikis')
+            path.append(self.wiki)
+        path.append('spaces')
         data = {}
         content = self._make_request(path, data)
         return content['spaces']
@@ -48,7 +53,13 @@ class Client:
         return spaces
 
     def pages(self, space):
-        path = ['spaces', space, 'pages']
+        path = []
+        if self.wiki:
+            path.append('wikis')
+            path.append(self.wiki)
+        path.append('spaces')
+        path.append(space)
+        path.append('pages')
         data = {}
         content = self._make_request(path, data)
         return content['pageSummaries']
@@ -60,8 +71,24 @@ class Client:
             pages.append(details['name'])
         return pages
 
-    def page(self, space, page):
-        path = ['spaces', space, 'pages', page]
+    def calculate_path(self, space, page, language = None):
+        path = []
+        if self.wiki:
+            path.append('wikis')
+            path.append(self.wiki)
+        space = space.replace("\.", "ESCAPED_DOT")
+        for space in space.split("."):
+            path.append("spaces")
+            path.append(space.replace("ESCAPED_DOT", '.'))
+        path.append("pages")
+        path.append(page)
+        if language:
+            path.append("translations")
+            path.append(language)
+        return path
+
+    def page(self, space, page = "WebHome", language = None):
+        path = self.calculate_path(space, page, language)
         data = {}
         content = self._make_request(path, data)
         return content
@@ -86,8 +113,8 @@ class Client:
         content = self._make_request(path, data)
         return content['pageSummaries']
 
-    def submit_page(self, space, page, content, title=None, parent=None):
-        path = ['spaces', space, 'pages', page]
+    def submit_page(self, space, page, content, title=None, parent=None, language=None):
+        path = self.calculate_path(space, page, language)
         data = {'content': content}
         if title:
             data['title'] = title
@@ -96,6 +123,18 @@ class Client:
 
         if parent:
             data['parent'] = parent
+
+        status = self._make_put(path, data)
+
+        if status == 201:
+            return "Created"
+        elif status == 202:
+            return "Updated"
+        elif status == 304:
+            return "Unmodified"
+
+    def update_page(self, data):
+        path = self.calculate_path(data["space"], data["name"], data["language"])
 
         status = self._make_put(path, data)
 
