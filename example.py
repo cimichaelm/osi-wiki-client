@@ -4,7 +4,7 @@ from xwikiclient import Client
 import json
 import replaceConfluence as rc
 
-wikiurl = 'http://wiki.example.org/rest/'
+wikiurl = 'http://wiki.example.org/xwiki/rest/'
 username = "JohnDoe"
 password = "TopSecret!"
 # optional parameter: wiki defaults to "xwiki"
