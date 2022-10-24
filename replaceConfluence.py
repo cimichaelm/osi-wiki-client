@@ -7,9 +7,10 @@ def replace_IncludeFirstParagraphWithoutHeading(content):
         m = re.search(f'\[\[doc:([^\]]*)\]\]\n\n{excerptInclude}', content)
         if m:
             page = m.groups(1)[0]
+            page_escaped_quotes = page.replace('"', '~"')
             content = content.replace(
                 f'[[doc:{page}]]\n\n{excerptInclude}',
-                '{{' + f'include reference="{page}" section="HInclude" excludeFirstHeading="true"/' + '}}\n')
+                '{{' + f'include reference="{page_escaped_quotes}" section="HInclude" excludeFirstHeading="true"/' + '}}\n')
         else:
             break
     return content
@@ -20,14 +21,16 @@ def replace_IncludeDocument(content):
         m = re.search(f'\[\[doc:([^\]]*)\]\]\n\n{excerptInclude}', content)
         if m:
             page = m.groups(1)[0]
+            page_escaped_quotes = page.replace('"', '~"')
             content = content.replace(
                 f'[[doc:{page}]]\n\n{excerptInclude}',
-                '{{' + f'include reference="{page}"/' + '}}\n')
+                '{{' + f'include reference="{page_escaped_quotes}"/' + '}}\n')
         else:
             break
     return content
 
 def fix_page(client, path, page = "WebHome", language = None):
+    path = path.replace("&amp;", "&")
     data = client.page(path, page, language)
     content = data["content"]
     print(content)
