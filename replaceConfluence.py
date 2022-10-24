@@ -2,6 +2,7 @@ from xwikiclient import Client
 import re
 
 def replace_IncludeFirstParagraphWithoutHeading(content):
+    content = content.replace("\r\n", "\n")
     while True:
         excerptInclude = '{{excerpt-include nopanel="true" 0=""/}}'
         m = re.search(f'\[\[doc:([^\]]*)\]\]\n\n{excerptInclude}', content)
@@ -16,6 +17,7 @@ def replace_IncludeFirstParagraphWithoutHeading(content):
     return content
 
 def replace_IncludeDocument(content):
+    content = content.replace("\r\n", "\n")
     while True:
         excerptInclude = '{{excerpt-include 0=""/}}'
         m = re.search(f'\[\[doc:([^\]]*)\]\]\n\n{excerptInclude}', content)
