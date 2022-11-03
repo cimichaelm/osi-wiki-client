@@ -71,6 +71,18 @@ class Client:
             pages.append(details['name'])
         return pages
 
+    def search(self, keywords):
+        path = []
+        if self.wiki:
+            path.append('wikis')
+            path.append(self.wiki)
+        path.append(f"search")
+        data = {}
+        data['q'] = keywords
+        data['scope'] = "content"
+        content = self._make_request(path, data)
+        return content
+
     def calculate_path(self, space, page, language = None):
         path = []
         if self.wiki:
