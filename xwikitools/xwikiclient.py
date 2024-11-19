@@ -20,6 +20,7 @@ class Client:
             auth = self.auth_user,self.auth_pass
 
         response = requests.get(url, params=data, auth=auth)
+        print(response)
         response.raise_for_status()
         return response.json()
 
